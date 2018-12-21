@@ -9,8 +9,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.ervin.ilhamcontoh.CommentActivity;
 import com.ervin.ilhamcontoh.R;
 import com.ervin.ilhamcontoh.model.Post;
 
@@ -36,9 +38,19 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>  {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-        Post postitems = postItem.get(i);
+        final Post postitems = postItem.get(i);
         viewHolder.postBody.setText(postitems.getBody());
         viewHolder.postTitle.setText(postitems.getTitle());
+        viewHolder.llPost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, CommentActivity.class);
+                intent.putExtra("idpost",postitems.getId());
+                System.out.println("idpost "+postitems.getId());
+                context.startActivity(intent);
+            }
+        });
+
     }
 
     @Override
@@ -51,12 +63,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>  {
 
         public TextView postTitle;
         public TextView postBody;
+        public LinearLayout llPost;
 
         public ViewHolder(final View itemView) {
             super(itemView);
 
             postTitle = itemView.findViewById(R.id.tv_title);
             postBody = itemView.findViewById(R.id.tv_body);
+            llPost = itemView.findViewById(R.id.ll_post);
 
         }
     }

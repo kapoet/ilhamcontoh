@@ -1,15 +1,16 @@
 package com.ervin.ilhamcontoh;
 
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.TextView;
+import android.util.Log;
 
+import com.ervin.ilhamcontoh.adapter.CommentAdapter;
 import com.ervin.ilhamcontoh.adapter.PostAdapter;
+import com.ervin.ilhamcontoh.model.Comment;
 import com.ervin.ilhamcontoh.model.Post;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -20,24 +21,28 @@ import com.koushikdutta.ion.Response;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
-    PostAdapter mAdapter;
+public class CommentActivity extends AppCompatActivity {
+    CommentAdapter mAdapter;
     RecyclerView rvPost;
     RecyclerView.LayoutManager mLayoutManager;
-    List<Post> postList;
+    List<Comment> commentList;
+    int idpost;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        rvPost = findViewById(R.id.rv_post);
+        setContentView(R.layout.activity_comment);
+
+        Intent intent = getIntent();
+        idpost=intent.getIntExtra("idpost",1);
+        rvPost = findViewById(R.id.rv_comment);
 
         rvPost.setHasFixedSize(true);
-        postList = new ArrayList<>();
+        commentList = new ArrayList<>();
 
         mLayoutManager = new LinearLayoutManager(this);
         rvPost.setLayoutManager(mLayoutManager);
 
-        mAdapter = new PostAdapter(postList, this);
+        mAdapter = new CommentAdapter(commentList, this);
         rvPost.setAdapter(mAdapter);
 
         final ProgressDialog progress = new ProgressDialog(this);
@@ -46,7 +51,8 @@ public class MainActivity extends AppCompatActivity {
         progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
         progress.show();
 
-        String url = "http://jsonplaceholder.typicode.com/posts";
+        String url = "http://jsonplaceholder.typicode.com/posts/"+idpost+"/comments";
+        Log.d("isinya", "onCreate: "+url);
         Ion.with(this)
                 .load("GET", url)
                 .asJsonArray()
@@ -58,11 +64,11 @@ public class MainActivity extends AppCompatActivity {
                             JsonArray jsonArray = result.getResult();
                             for (int i = 0; i<jsonArray.size();i++){
                                 JsonObject jsonObject = jsonArray.get(i).getAsJsonObject();
-                                Post postTemp = new Post();
-                                postTemp.setBody(jsonObject.get("body").getAsString());
-                                postTemp.setTitle(jsonObject.get("title").getAsString());
-                                postTemp.setId(jsonObject.get("id").getAsInt());
-                                postList.add(postTemp);
+                                Comment commentTemp = new Comment();
+                                commentTemp.setBody(jsonObject.get("body").getAsString());
+                                commentTemp.setEmail(jsonObject.get("email").getAsString());
+                                commentTemp.setName(jsonObject.get("name").getAsString());
+                                commentList.add(commentTemp);
                                 mAdapter.notifyDataSetChanged();
                             }
                             progress.dismiss();
